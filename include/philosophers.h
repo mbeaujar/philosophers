@@ -6,7 +6,7 @@
 /*   By: mbeaujar <mbeaujar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/14 18:46:05 by mbeaujar          #+#    #+#             */
-/*   Updated: 2021/06/18 23:18:58 by mbeaujar         ###   ########.fr       */
+/*   Updated: 2021/06/19 14:35:27 by mbeaujar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ typedef struct s_philo
 	unsigned long time_to_sleep;
 	unsigned long last_meal;
 	pthread_mutex_t *forks;
-	pthread_mutex_t msg;
+	pthread_mutex_t *msg;
 } t_philo;
 
 typedef struct s_var

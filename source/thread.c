@@ -6,7 +6,7 @@
 /*   By: mbeaujar <mbeaujar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/18 19:54:34 by mbeaujar          #+#    #+#             */
-/*   Updated: 2021/06/18 23:29:21 by mbeaujar         ###   ########.fr       */
+/*   Updated: 2021/06/19 14:27:22 by mbeaujar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,12 +33,9 @@ void join_thread(t_var *var)
 int create_thread(t_var *var)
 {
 	int i;
-	struct timeval time;
 
 	i = 0;
-	gettimeofday(&time, NULL);
 	var->time_start = get_time();
-	//printf("start : %lu\n", var->time_start);
 	while (i < var->nb_of_philo)
 	{
 		if (pthread_create(&var->thread_id[i], NULL, routine, &var->philosophers[i]) != 0)

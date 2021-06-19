@@ -6,7 +6,7 @@
 /*   By: mbeaujar <mbeaujar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/16 20:12:36 by mbeaujar          #+#    #+#             */
-/*   Updated: 2021/06/18 20:30:02 by mbeaujar         ###   ########.fr       */
+/*   Updated: 2021/06/19 14:28:57 by mbeaujar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ unsigned long atoul(char *str)
 	return (nb);
 }
 
-int	fill_struct(t_var *var, int argc, char **argv)
+int check_arguments(int argc, char **argv)
 {
 	int i;
 
@@ -64,6 +64,13 @@ int	fill_struct(t_var *var, int argc, char **argv)
 			return (1);
 		i++;
 	}
+	return (0);
+}
+
+int fill_struct(t_var *var, int argc, char **argv)
+{
+	if (check_arguments(argc, argv))
+		return (1);
 	var->nb_of_philo = atoint(argv[1]);
 	var->time_to_die = atoul(argv[2]);
 	var->time_to_eat = atoul(argv[3]);

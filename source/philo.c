@@ -6,7 +6,7 @@
 /*   By: mbeaujar <mbeaujar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/14 18:45:48 by mbeaujar          #+#    #+#             */
-/*   Updated: 2021/06/18 23:19:42 by mbeaujar         ###   ########.fr       */
+/*   Updated: 2021/06/19 14:35:15 by mbeaujar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,16 +17,17 @@ void *routine(void *vargp)
 	t_philo *philo;
 
 	philo = (t_philo*)vargp;
-	pthread_mutex_init(&philo->msg, NULL);
 	while (philo->is_dead == 0)
 	{
 		eat(philo);
-		philo->is_dead = 1;
-		if (philo->nb_eaten >= philo->nb_must_eat || philo->is_dead == 1)
+		if (philo->is_dead == 1 || (philo->nb_must_eat != -1 && philo->nb_eaten >= philo->nb_must_eat))
 			break ;
+		print_msg(philo, "is sleeping");
+		sleep_time(philo->time_to_sleep);
+		if (philo->is_dead == 1)
+			break ;
+		print_msg(philo, "is thinking");
 	}
-	//printf("oui\n");
-	pthread_mutex_destroy(&philo->msg);
 	return (NULL);
 }
 
@@ -48,7 +49,7 @@ void init_philo(t_var *var)
 		var->philosophers[i].time_to_eat = var->time_to_eat;
 		var->philosophers[i].time_to_sleep = var->time_to_sleep;
 		var->philosophers[i].time_start = &var->time_start;
-		//var->philosophers[i].msg = &var->msg;
+		var->philosophers[i].msg = &var->msg;
 		i++;
 	}
 }
