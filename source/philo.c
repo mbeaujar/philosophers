@@ -6,28 +6,53 @@
 /*   By: mbeaujar <mbeaujar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/14 18:45:48 by mbeaujar          #+#    #+#             */
-/*   Updated: 2021/06/19 14:35:15 by mbeaujar         ###   ########.fr       */
+/*   Updated: 2021/06/19 15:21:40 by mbeaujar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
 
-void *routine(void *vargp)
+void *monitor(void *vargp)
 {
 	t_philo *philo;
 
 	philo = (t_philo*)vargp;
-	while (philo->is_dead == 0)
+	while (*philo->is_dead == 0)
 	{
+		if (get_time() - philo->last_meal >= philo->time_to_die)
+		{
+			print_msg(philo, "died");
+			*philo->is_dead = 1;
+			return (NULL);
+		}
+		else if (philo->nb_must_eat != -1 && philo->nb_eaten >= philo->nb_must_eat)
+			break ;
+	}
+	return (NULL);
+}
+
+void *routine(void *vargp)
+{
+	t_philo *philo;
+	pthread_t id;
+
+	philo = (t_philo*)vargp;
+	philo->last_meal = get_time();
+	pthread_create(&id, NULL, monitor, philo);
+	while (*philo->is_dead == 0)
+	{
+		if (*philo->is_dead == 1)
+			break ;
 		eat(philo);
-		if (philo->is_dead == 1 || (philo->nb_must_eat != -1 && philo->nb_eaten >= philo->nb_must_eat))
+		if (*philo->is_dead == 1 || (philo->nb_must_eat != -1 && philo->nb_eaten >= philo->nb_must_eat))
 			break ;
 		print_msg(philo, "is sleeping");
 		sleep_time(philo->time_to_sleep);
-		if (philo->is_dead == 1)
+		if (*philo->is_dead == 1)
 			break ;
 		print_msg(philo, "is thinking");
 	}
+	pthread_detach(id);
 	return (NULL);
 }
 
@@ -39,7 +64,7 @@ void init_philo(t_var *var)
 	while (i < var->nb_of_philo)
 	{
 		var->philosophers[i].forks = var->forks;
-		var->philosophers[i].is_dead = 0;
+		var->philosophers[i].is_dead = &var->is_dead;
 		var->philosophers[i].last_meal = -1;
 		var->philosophers[i].nb = i;
 		var->philosophers[i].nb_eaten = 0;
@@ -72,5 +97,7 @@ int main(int argc, char **argv)
 	free(var.philosophers);
 	free(var.forks);
 	free(var.thread_id);
+	if (var.nb_must_eat != -1 && var.is_dead == 0)
+		printf("%lu\t%s\n", get_time() - var.time_start, "Everyone has eaten enough !");
 	return (0);
 }

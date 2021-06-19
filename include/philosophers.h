@@ -6,7 +6,7 @@
 /*   By: mbeaujar <mbeaujar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/14 18:46:05 by mbeaujar          #+#    #+#             */
-/*   Updated: 2021/06/19 14:35:27 by mbeaujar         ###   ########.fr       */
+/*   Updated: 2021/06/19 15:04:32 by mbeaujar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ typedef struct s_philo
 {
 	int nb;
 	int max_nb;
-	int is_dead;
+	int *is_dead;
 	int nb_must_eat;
 	int nb_eaten;
 	unsigned long *time_start;
@@ -37,6 +37,7 @@ typedef struct s_philo
 
 typedef struct s_var
 {
+	int is_dead;
 	int nb_of_philo;
 	t_philo *philosophers;
 	pthread_t *thread_id;
@@ -52,7 +53,7 @@ typedef struct s_var
 int	fill_struct(t_var *var, int argc, char **argv);
 int init_mutex(t_var *var);
 void init_philo(t_var *var);
-void detach_thread(t_var *var, int i);
+int detach_thread(t_var *var);
 void join_thread(t_var *var);
 void eat(t_philo *philo);
 unsigned long get_time(void);
