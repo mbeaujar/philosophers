@@ -6,17 +6,39 @@
 /*   By: mbeaujar <mbeaujar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/14 18:45:48 by mbeaujar          #+#    #+#             */
-/*   Updated: 2021/06/19 17:24:06 by mbeaujar         ###   ########.fr       */
+/*   Updated: 2021/06/19 19:04:34 by mbeaujar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
 
-void *monitor(void *vargp)
+void	eat(t_philo *philo)
 {
-	t_philo *philo;
+	pthread_mutex_lock(&philo->forks[philo->nb]);
+	print_msg(philo, "has taken a fork");
+	if (philo->nb + 1 == philo->max_nb)
+		pthread_mutex_lock(&philo->forks[0]);
+	else
+		pthread_mutex_lock(&philo->forks[philo->nb + 1]);
+	print_msg(philo, "has taken a fork");
+	pthread_mutex_lock(&philo->meals);
+	philo->last_meal = get_time();
+	print_msg(philo, "is eating");
+	sleep_time(philo->time_to_eat);
+	pthread_mutex_unlock(&philo->meals);
+	if (philo->nb + 1 == philo->max_nb)
+		pthread_mutex_unlock(&philo->forks[0]);
+	else
+		pthread_mutex_unlock(&philo->forks[philo->nb + 1]);
+	pthread_mutex_unlock(&philo->forks[philo->nb]);
+	philo->nb_eaten++;
+}
 
-	philo = (t_philo*)vargp;
+void	*monitor(void *vargp)
+{
+	t_philo	*philo;
+
+	philo = (t_philo *)vargp;
 	while (*philo->is_dead == 0)
 	{
 		pthread_mutex_lock(&philo->meals);
@@ -29,7 +51,8 @@ void *monitor(void *vargp)
 			pthread_mutex_unlock(&philo->meals);
 			break ;
 		}
-		else if (philo->nb_must_eat != -1 && philo->nb_eaten >= philo->nb_must_eat)
+		else if (philo->nb_must_eat != -1
+			&& philo->nb_eaten >= philo->nb_must_eat)
 		{
 			pthread_mutex_unlock(&philo->meals);
 			break ;
@@ -40,12 +63,12 @@ void *monitor(void *vargp)
 	return (NULL);
 }
 
-void *routine(void *vargp)
+void	*routine(void *vargp)
 {
-	t_philo *philo;
-	pthread_t id;
+	t_philo		*philo;
+	pthread_t	id;
 
-	philo = (t_philo*)vargp;
+	philo = (t_philo *)vargp;
 	philo->last_meal = get_time();
 	pthread_mutex_init(&philo->meals, NULL);
 	pthread_create(&id, NULL, monitor, philo);
@@ -54,7 +77,8 @@ void *routine(void *vargp)
 		if (*philo->is_dead == 1)
 			break ;
 		eat(philo);
-		if (*philo->is_dead == 1 || (philo->nb_must_eat != -1 && philo->nb_eaten >= philo->nb_must_eat))
+		if (*philo->is_dead == 1 || (philo->nb_must_eat != -1
+				&& philo->nb_eaten >= philo->nb_must_eat))
 			break ;
 		print_msg(philo, "is sleeping");
 		sleep_time(philo->time_to_sleep);
@@ -67,12 +91,12 @@ void *routine(void *vargp)
 	return (NULL);
 }
 
-void init_philo(t_var *var)
+void	init_philo(t_var *var)
 {
-	int i;
+	int	i;
 
-	i = 0;
-	while (i < var->nb_of_philo)
+	i = -1;
+	while (++i < var->nb_of_philo)
 	{
 		var->philosophers[i].forks = var->forks;
 		var->philosophers[i].is_dead = &var->is_dead;
@@ -86,29 +110,32 @@ void init_philo(t_var *var)
 		var->philosophers[i].time_to_sleep = var->time_to_sleep;
 		var->philosophers[i].time_start = &var->time_start;
 		var->philosophers[i].msg = &var->msg;
-		i++;
 	}
 }
 
-int main(int argc, char **argv)
+int	main(int argc, char **argv)
 {
-	t_var var;
-	
+	t_var	var;
+	int		i;
+
+	i = -1;
 	if (argc < 5 || argc > 6)
-		return (printf("Wrong number of arguments.\n"));
-	if (fill_struct(&var, argc, argv))
-		return (1);
-	if (init_mutex(&var))
+		return (printf("Wrong number of arguments.\n") - 26);
+	if (fill_struct(&var, argc, argv) || init_mutex(&var))
 		return (1);
 	init_philo(&var);
-	if (create_thread(&var))
-		return (1);
-	join_thread(&var);
-	destroy_mutex(&var);
+	create_thread(&var);
+	while (++i < var.nb_of_philo)
+		pthread_mutex_destroy(&var.forks[i]);
+	pthread_mutex_destroy(&var.msg);
+	i = -1;
+	while (++i < var.nb_of_philo)
+		pthread_join(var.id[i], NULL);
 	free(var.philosophers);
 	free(var.forks);
-	free(var.thread_id);
+	free(var.id);
 	if (var.nb_must_eat != -1 && var.is_dead == 0)
-		printf("%lu\t%s\n", get_time() - var.time_start, "Everyone has eaten enough !");
+		printf("%lu\t%s\n", get_time() - var.time_start,
+			"Everyone has eaten enough !");
 	return (0);
 }

@@ -6,27 +6,25 @@
 /*   By: mbeaujar <mbeaujar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/16 20:12:36 by mbeaujar          #+#    #+#             */
-/*   Updated: 2021/06/19 15:04:42 by mbeaujar         ###   ########.fr       */
+/*   Updated: 2021/06/19 19:03:28 by mbeaujar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
 
-int valid_argument(char *str)
+void	print_msg(t_philo *philo, char *str)
 {
-	while (*str)
-	{
-		if (*str < '0' && *str > '9')
-			return (1);
-		str++;
-	}
-	return (0);
+	pthread_mutex_lock(philo->msg);
+	if (*philo->is_dead == 0)
+		printf("%lu\t%d %s\n",
+			get_time() - *philo->time_start, philo->nb + 1, str);
+	pthread_mutex_unlock(philo->msg);
 }
 
-int atoint(char *str)
+int	atoint(char *str)
 {
-	int nb;
-	int i;
+	int	nb;
+	int	i;
 
 	nb = 0;
 	i = 0;
@@ -38,10 +36,10 @@ int atoint(char *str)
 	return (nb);
 }
 
-unsigned long atoul(char *str)
+unsigned long	atoul(char *str)
 {
-	unsigned long nb;
-	int i;
+	unsigned long	nb;
+	int				i;
 
 	nb = 0;
 	i = 0;
@@ -53,21 +51,30 @@ unsigned long atoul(char *str)
 	return (nb);
 }
 
-int check_arguments(int argc, char **argv)
+int	check_arguments(int argc, char **argv)
 {
-	int i;
+	int	i;
+	int	j;
 
 	i = 1;
-	while (i < argc - 1)
+	while (i < argc)
 	{
-		if (valid_argument(argv[i]))
-			return (1);
+		j = 0;
+		while (argv[i][j])
+		{
+			if (argv[i][j] < '0' || argv[i][j] > '9')
+			{
+				printf("bad arguments\n");
+				return (1);
+			}
+			j++;
+		}
 		i++;
 	}
 	return (0);
 }
 
-int fill_struct(t_var *var, int argc, char **argv)
+int	fill_struct(t_var *var, int argc, char **argv)
 {
 	if (check_arguments(argc, argv))
 		return (1);

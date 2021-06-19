@@ -6,10 +6,7 @@ HEADER=include
 
 SRCS= source/mutex.c \
 	source/parsing.c \
-	source/philo.c \
-	source/state.c \
-	source/thread.c \
-	source/time.c 
+	source/philo.c 
 
 OBJS= $(SRCS:.c=.o)
 
