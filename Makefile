@@ -4,10 +4,12 @@ CFLAGS= -Wall -Wextra -Werror
 RM=rm -f 
 HEADER=include
 
-SRCS= source/init.c \
-	source/main.c \
-	source/mutex.c \
-	source/gestion.c
+SRCS= source/mutex.c \
+	source/parsing.c \
+	source/philo.c \
+	source/state.c \
+	source/thread.c \
+	source/time.c 
 
 OBJS= $(SRCS:.c=.o)
 

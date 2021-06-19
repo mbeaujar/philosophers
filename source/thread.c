@@ -1,57 +1,57 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   thread.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mbeaujar <mbeaujar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/06/14 18:45:48 by mbeaujar          #+#    #+#             */
-/*   Updated: 2021/06/16 22:03:59 by mbeaujar         ###   ########.fr       */
+/*   Created: 2021/06/18 19:54:34 by mbeaujar          #+#    #+#             */
+/*   Updated: 2021/06/18 23:29:21 by mbeaujar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
 
-void *routine(void *vargp)
+void detach_thread(t_var *var, int i)
 {
-	t_philo *philo;
-
-	philo = (t_philo*)vargp;
-	printf("oui\n");
-	return (NULL);
+	while (i-- > 0)
+		pthread_detach(var->thread_id[i]);
 }
 
-int create_thread(t_var *var)
+void join_thread(t_var *var)
 {
 	int i;
 
 	i = 0;
 	while (i < var->nb_of_philo)
 	{
+		pthread_join(var->thread_id[i], NULL);
+		i++;
+	}
+}
+
+int create_thread(t_var *var)
+{
+	int i;
+	struct timeval time;
+
+	i = 0;
+	gettimeofday(&time, NULL);
+	var->time_start = get_time();
+	//printf("start : %lu\n", var->time_start);
+	while (i < var->nb_of_philo)
+	{
 		if (pthread_create(&var->thread_id[i], NULL, routine, &var->philosophers[i]) != 0)
 		{
 			detach_thread(var, i);
+			destroy_mutex(var);
+			free(var->philosophers);
+			free(var->forks);
+			free(var->thread_id);
 			return (1);
 		}
+		usleep(70);
 		i++;
 	}
-	return (0);
-}
-
-
-int main(int argc, char **argv)
-{
-	t_var var;
-	
-	if (argc < 5 || argc > 6)
-		return (printf("Wrong number of arguments.\n"));
-	if (fill_struct(&var, argc, argv))
-		return (1);
-	if (init_mutex(&var))
-		return (1);
-	init_mutex(&var);
-	if (create_thread(&var))
-		return (1);
-	join_thread(&var);
 	return (0);
 }
