@@ -6,7 +6,7 @@
 /*   By: mbeaujar <mbeaujar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/18 19:40:59 by mbeaujar          #+#    #+#             */
-/*   Updated: 2021/06/19 15:16:13 by mbeaujar         ###   ########.fr       */
+/*   Updated: 2021/06/19 17:16:04 by mbeaujar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,6 @@ void print_msg(t_philo *philo, char *str)
 {
 	pthread_mutex_lock(philo->msg);
 	if (*philo->is_dead == 0)
-		printf("%lu\t%d %s\n", get_time() - *philo->time_start, philo->nb + 1, str);
+		printf("%lu\t#%d %s\n", get_time() - *philo->time_start, philo->nb + 1, str);
 	pthread_mutex_unlock(philo->msg);
 }

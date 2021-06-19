@@ -6,7 +6,7 @@
 /*   By: mbeaujar <mbeaujar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/14 18:45:48 by mbeaujar          #+#    #+#             */
-/*   Updated: 2021/06/19 15:21:40 by mbeaujar         ###   ########.fr       */
+/*   Updated: 2021/06/19 17:24:06 by mbeaujar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,14 +19,23 @@ void *monitor(void *vargp)
 	philo = (t_philo*)vargp;
 	while (*philo->is_dead == 0)
 	{
+		pthread_mutex_lock(&philo->meals);
 		if (get_time() - philo->last_meal >= philo->time_to_die)
 		{
 			print_msg(philo, "died");
 			*philo->is_dead = 1;
-			return (NULL);
+			if (philo->max_nb == 1)
+				pthread_mutex_unlock(&philo->forks[0]);
+			pthread_mutex_unlock(&philo->meals);
+			break ;
 		}
 		else if (philo->nb_must_eat != -1 && philo->nb_eaten >= philo->nb_must_eat)
+		{
+			pthread_mutex_unlock(&philo->meals);
 			break ;
+		}
+		pthread_mutex_unlock(&philo->meals);
+		usleep(500);
 	}
 	return (NULL);
 }
@@ -38,6 +47,7 @@ void *routine(void *vargp)
 
 	philo = (t_philo*)vargp;
 	philo->last_meal = get_time();
+	pthread_mutex_init(&philo->meals, NULL);
 	pthread_create(&id, NULL, monitor, philo);
 	while (*philo->is_dead == 0)
 	{
@@ -52,6 +62,7 @@ void *routine(void *vargp)
 			break ;
 		print_msg(philo, "is thinking");
 	}
+	pthread_mutex_destroy(&philo->meals);
 	pthread_detach(id);
 	return (NULL);
 }

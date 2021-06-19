@@ -6,7 +6,7 @@
 /*   By: mbeaujar <mbeaujar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/18 19:54:34 by mbeaujar          #+#    #+#             */
-/*   Updated: 2021/06/19 14:45:06 by mbeaujar         ###   ########.fr       */
+/*   Updated: 2021/06/19 17:07:03 by mbeaujar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ void join_thread(t_var *var)
 	}
 }
 
-/* int create_thread(t_var *var)
+int create_thread(t_var *var)
 {
 	int i;
 
@@ -56,34 +56,6 @@ void join_thread(t_var *var)
 		}
 		usleep(70);
 		i++;
-	}
-	return (0);
-} */
-
-int create_thread(t_var *var)
-{
-	int i;
-
-	i = -1;
-	var->time_start = get_time();
-	while (++i < var->nb_of_philo)
-	{
-		if (!(i % 2))
-		{
-			if (pthread_create(&var->thread_id[i], NULL, routine, &var->philosophers[i]) != 0)
-				return (detach_thread(var));
-			usleep(100);
-		}
-	}
-	i = -1;
-	while (++i < var->nb_of_philo)
-	{
-		if (i % 2)
-		{
-			if (pthread_create(&var->thread_id[i], NULL, routine, &var->philosophers[i]) != 0)
-				return (detach_thread(var));
-			usleep(100);
-		}
 	}
 	return (0);
 }
