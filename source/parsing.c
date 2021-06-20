@@ -6,7 +6,7 @@
 /*   By: mbeaujar <mbeaujar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/16 20:12:36 by mbeaujar          #+#    #+#             */
-/*   Updated: 2021/06/19 19:03:28 by mbeaujar         ###   ########.fr       */
+/*   Updated: 2021/06/20 19:07:31 by mbeaujar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,10 +82,10 @@ int	fill_struct(t_var *var, int argc, char **argv)
 	var->time_to_die = atoul(argv[2]);
 	var->time_to_eat = atoul(argv[3]);
 	var->time_to_sleep = atoul(argv[4]);
-	var->nb_must_eat = -1;
+	var->must_eat = -1;
 	var->is_dead = 0;
 	if (argc == 6)
-		var->nb_must_eat = atoint(argv[5]);
+		var->must_eat = atoint(argv[5]);
 	var->philosophers = malloc(sizeof(t_philo) * var->nb_of_philo);
 	if (!var->philosophers)
 		return (1);

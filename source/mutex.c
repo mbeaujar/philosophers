@@ -6,7 +6,7 @@
 /*   By: mbeaujar <mbeaujar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/16 20:45:17 by mbeaujar          #+#    #+#             */
-/*   Updated: 2021/06/19 19:03:50 by mbeaujar         ###   ########.fr       */
+/*   Updated: 2021/06/20 19:36:44 by mbeaujar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,8 +54,11 @@ int	create_thread(t_var *var)
 	{
 		if (pthread_create(&var->id[i], NULL, routine, &var->philosophers[i]))
 			return (1);
-		usleep(70);
+		usleep(500);
 	}
+	i = -1;
+	while (++i < var->nb_of_philo)
+		pthread_mutex_destroy(&var->forks[i]);
 	return (0);
 }
 

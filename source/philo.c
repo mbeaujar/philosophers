@@ -6,7 +6,7 @@
 /*   By: mbeaujar <mbeaujar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/14 18:45:48 by mbeaujar          #+#    #+#             */
-/*   Updated: 2021/06/19 19:04:34 by mbeaujar         ###   ########.fr       */
+/*   Updated: 2021/06/20 20:31:32 by mbeaujar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ void	eat(t_philo *philo)
 	else
 		pthread_mutex_unlock(&philo->forks[philo->nb + 1]);
 	pthread_mutex_unlock(&philo->forks[philo->nb]);
-	philo->nb_eaten++;
+	philo->nb_eat++;
 }
 
 void	*monitor(void *vargp)
@@ -51,8 +51,7 @@ void	*monitor(void *vargp)
 			pthread_mutex_unlock(&philo->meals);
 			break ;
 		}
-		else if (philo->nb_must_eat != -1
-			&& philo->nb_eaten >= philo->nb_must_eat)
+		else if (philo->must_eat != -1 && philo->nb_eat >= philo->must_eat)
 		{
 			pthread_mutex_unlock(&philo->meals);
 			break ;
@@ -74,11 +73,9 @@ void	*routine(void *vargp)
 	pthread_create(&id, NULL, monitor, philo);
 	while (*philo->is_dead == 0)
 	{
-		if (*philo->is_dead == 1)
-			break ;
 		eat(philo);
-		if (*philo->is_dead == 1 || (philo->nb_must_eat != -1
-				&& philo->nb_eaten >= philo->nb_must_eat))
+		if (*philo->is_dead == 1 || (philo->must_eat != -1
+				&& philo->nb_eat >= philo->must_eat))
 			break ;
 		print_msg(philo, "is sleeping");
 		sleep_time(philo->time_to_sleep);
@@ -102,9 +99,9 @@ void	init_philo(t_var *var)
 		var->philosophers[i].is_dead = &var->is_dead;
 		var->philosophers[i].last_meal = -1;
 		var->philosophers[i].nb = i;
-		var->philosophers[i].nb_eaten = 0;
+		var->philosophers[i].nb_eat = 0;
 		var->philosophers[i].max_nb = var->nb_of_philo;
-		var->philosophers[i].nb_must_eat = var->nb_must_eat;
+		var->philosophers[i].must_eat = var->must_eat;
 		var->philosophers[i].time_to_die = var->time_to_die;
 		var->philosophers[i].time_to_eat = var->time_to_eat;
 		var->philosophers[i].time_to_sleep = var->time_to_sleep;
@@ -125,16 +122,13 @@ int	main(int argc, char **argv)
 		return (1);
 	init_philo(&var);
 	create_thread(&var);
-	while (++i < var.nb_of_philo)
-		pthread_mutex_destroy(&var.forks[i]);
 	pthread_mutex_destroy(&var.msg);
-	i = -1;
 	while (++i < var.nb_of_philo)
 		pthread_join(var.id[i], NULL);
 	free(var.philosophers);
 	free(var.forks);
 	free(var.id);
-	if (var.nb_must_eat != -1 && var.is_dead == 0)
+	if (var.must_eat != -1 && var.is_dead == 0)
 		printf("%lu\t%s\n", get_time() - var.time_start,
 			"Everyone has eaten enough !");
 	return (0);
