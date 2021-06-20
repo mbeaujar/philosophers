@@ -84,7 +84,7 @@ void	*routine(void *vargp)
 		print_msg(philo, "is thinking");
 	}
 	pthread_mutex_destroy(&philo->meals);
-	pthread_detach(id);
+	pthread_join(id, NULL);
 	return (NULL);
 }
 
