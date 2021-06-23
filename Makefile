@@ -3,7 +3,7 @@ UNAME=$(shell uname)
 CFLAGS = -Wall -Wextra -Werror
 
 ifeq ($(UNAME), Linux)
-	CFLAGS+=-lpthread
+	LIB=-lpthread
 endif
 
 NAME=philo
@@ -23,7 +23,7 @@ OBJS= $(SRCS:.c=.o)
 all : $(NAME)
 
 $(NAME) : $(OBJS)
-	@$(CC) $(CFLAGS) $(OBJS) -o $@
+	@$(CC) $(OBJS) $(LIB) -o $@
 
 clean : 
 	@$(RM) $(OBJS)
