@@ -1,14 +1,13 @@
 UNAME=$(shell uname)
 
+CFLAGS = -Wall -Wextra -Werror
+
 ifeq ($(UNAME), Linux)
-	LIBRARY=-lpthread
+	CFLAGS+=-lpthread
 endif
-ifeq ($(UNAME), Darwin)
-	LIBRARY=-Wall -Wextra -Werror
-endif
+
 NAME=philo
 CC=clang
-CFLAGS= -Wall -Wextra -Werror
 RM=rm -f 
 HEADER=include
 
@@ -24,7 +23,7 @@ OBJS= $(SRCS:.c=.o)
 all : $(NAME)
 
 $(NAME) : $(OBJS)
-	@$(CC) $(OBJS) $(LIBRARY) -o $@
+	@$(CC) $(CFLAGS) $(OBJS) -o $@
 
 clean : 
 	@$(RM) $(OBJS)
