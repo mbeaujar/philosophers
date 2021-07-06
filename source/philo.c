@@ -122,9 +122,9 @@ int	main(int argc, char **argv)
 		return (1);
 	init_philo(&var);
 	create_thread(&var);
-	pthread_mutex_destroy(&var.msg);
 	while (++i < var.nb_of_philo)
 		pthread_join(var.id[i], NULL);
+	pthread_mutex_destroy(&var.msg);
 	free(var.philosophers);
 	free(var.forks);
 	free(var.id);
